@@ -71,7 +71,7 @@ class QPlay():
 
 			best_row = random.choice(best_rows)
 
-			q_row = self.q_state_dict[tuple(best_row)]
+			q_row = self.q_state_dict[tuple(best_row)].copy()
 			q_row[legal_mode_mask == 0] = np.nan
 			action = np.nanargmax(q_row)
 			return action // 3, action % 3
