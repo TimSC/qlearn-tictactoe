@@ -45,10 +45,14 @@ class QPlay():
 			ch = random.randint(0, len(legal_moves_x)-1)
 			return legal_moves_x[ch], legal_moves_y[ch]			
 
+		legal_mode_mask = GetLegalMoveMask(environ)
+
 		if s in self.q_state_dict:
+
 			#Found matching state
-			q_row = self.q_state_dict[s]
-			action = np.argmax(q_row)
+			q_row = self.q_state_dict[s].copy()
+			q_row[legal_mode_mask == 0] = np.nan
+			action = np.nanargmax(q_row)
 			return action // 3, action % 3
 
 		else:
@@ -68,7 +72,8 @@ class QPlay():
 			best_row = random.choice(best_rows)
 
 			q_row = self.q_state_dict[tuple(best_row)]
-			action = np.argmax(q_row)
+			q_row[legal_mode_mask == 0] = np.nan
+			action = np.nanargmax(q_row)
 			return action // 3, action % 3
 
 def CheckForWin(environ):
@@ -120,6 +125,10 @@ def CheckForWin(environ):
 
 def GetLegalMoves(environ):
 	m = np.where(environ == 0)
+	return m
+
+def GetLegalMoveMask(environ):
+	m = environ.flatten() == 0
 	return m
 
 if __name__=="__main__":
@@ -181,17 +190,14 @@ if __name__=="__main__":
 				action_id = move1[0] * 3 + move1[1]
 
 			else:
-				# Panned move (exploitation)
-				action_id = np.argmax(q_row)
-				move1 = action_id // 3, action_id % 3
-				if environ[*move1] != 0:
+				legal_mode_mask = GetLegalMoveMask(environ)
 
-					# Something went wrong, so fall back to random
-					legal_moves_x, legal_moves_y = GetLegalMoves(environ)
-					assert len(legal_moves_x) > 0
-					ch = random.randint(0, len(legal_moves_x)-1)
-					move1 = legal_moves_x[ch], legal_moves_y[ch]
-					action_id = move1[0] * 3 + move1[1]
+				# Planned move (exploitation)
+				q_row = q_row.copy()
+				q_row[legal_mode_mask == 0] = np.nan
+				action_id = np.nanargmax(q_row)
+				move1 = action_id // 3, action_id % 3
+				assert environ[*move1] == 0
 
 			# Perform action
 
