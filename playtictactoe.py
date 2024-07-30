@@ -1,11 +1,14 @@
 import numpy as np
-from qlearntictactoe import CheckForWin, GetLegalMoves, QPlay
+from qlearntictactoe import CheckForWin, GetLegalMoves, QLearnPlay
 
 if __name__=="__main__":
 
 	ai_player_id = 1
 	human_player_id = 2
-	qPlay = QPlay(ai_player_id, swap_player_ids=True)
+	qPlay = QLearnPlay(ai_player_id, 
+		'q_table.npy', 'q_table_keys.npy',
+		swap_player_ids=False)
+	qPlay.set_epsilon(0.0)
 	
 	environ = np.zeros((3,3), dtype=np.int8)
 	
@@ -39,7 +42,7 @@ if __name__=="__main__":
 			exit(0)
 
 		print (environ)
-		r, c = qPlay.get_move(environ)
+		action, r, c = qPlay.get_move(environ)
 
 		if environ[r, c] == 0:
 			environ[r, c] = ai_player_id
