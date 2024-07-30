@@ -195,16 +195,20 @@ def run():
 	max_steps = 100000
 
 	train_player = QLearnPlay(1)
-	#opponent = RandomPlay(2)
-	opponent = QLearnPlay(2, fina='q_table1.npy', fina_keys='q_table_keys1.npy', 
-		swap_player_ids = True)
+	random_train = True
+	if random_train:
+		opponent = RandomPlay(2)
+	else:
+		opponent = QLearnPlay(2, fina='q_table1.npy', fina_keys='q_table_keys1.npy', 
+			swap_player_ids = True)
 
 	for i in range(max_steps):
 
 		epsilon = max_epsilon + (min_epsilon - max_epsilon) * i / max_steps
 		environ = np.zeros((3,3), dtype=np.int8)
 		train_player.set_epsilon(epsilon)
-		opponent.set_epsilon(epsilon)
+		if not random_train:
+			opponent.set_epsilon(epsilon)
 
 		if random.randint(0,1) != 0:
 			# Opponent goes first
