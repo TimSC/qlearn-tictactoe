@@ -186,10 +186,6 @@ def GetLegalMoveMask(environ):
 
 def run():
 
-	c = [0, 0]
-
-	move_count = 0
-
 	max_epsilon = 1.0
 	min_epsilon = 0.05
 	max_steps = 100000
